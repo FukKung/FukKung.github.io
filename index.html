@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สุขสันต์วันเกิด 16 ขวบ - การ์ดอวยพรแมวน่ารัก</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            position: relative;
+        }
+        body {
+            font-family: 'Sarabun', sans-serif;
+            overflow-x: hidden;
+            background: linear-gradient(to bottom right, #fbcfe8, #fce7f3, #fecdd3);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border: 0px solid transparent;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px) rotateY(5deg);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .cat-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .cat-shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+            transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
+            perspective: 1000px;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        /* === ปรับปรุง Animation สำหรับหัวข้อ === */
+        .main-greeting {
+            font-weight: 800;
+            background: linear-gradient(45deg, #ff6b6b, #ffa502, #ffd32a, #0be881, #0fbcf9, #3c40c6, #f53b57);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rainbowGlow 3s ease infinite, bounceIn 1.5s ease-out forwards;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        @keyframes rainbowGlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .blessing-full {
+            display: none;
+        }
+        
+        .fireworks-canvas, .confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        .confetti-canvas {
+            z-index: 10000;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10003;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            max-width: 32rem;
+            width: 90%;
+            text-align: center;
+            transform: scale(0.7) rotateY(30deg);
+            opacity: 0;
+            transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+        }
+        .modal-overlay.active .modal-content {
+            transform: scale(1) rotateY(0deg);
+            opacity: 1;
+        }
+        
+        main {
+            position: relative;
+            z-index: 10002;
+            width: 100%;
+            max-width: 6xl;
+        }
+
+        #landingPageContent {
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10004;
+            background: linear-gradient(to bottom right, #fbcfe8, #fce7f3, #fecdd3);
+            width: 100%;
+            height: 100%;
+        }
+        #landingPageContent.hidden {
+            opacity: 0;
+            transform: translateY(-20px);
+            pointer-events: none;
+            visibility: hidden;
+        }
+
+        #birthdayCardsContainer {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            padding: 1rem;
+            background: linear-gradient(to bottom right, #fbcfe8, #fce7f3, #fecdd3);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10005;
+        }
+        #birthdayCardsContainer.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        /* === CSS สำหรับแมววิ่งบนการ์ด === */
+        .running-cat-on-card {
+            position: absolute;
+            font-size: 1.8rem;
+            z-index: 5;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        @keyframes runLeftRight {
+            0% { left: -5%; top: 20%; transform: translateY(-50%) scaleX(1); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { left: calc(100% + 5%); top: 20%; transform: translateY(-50%) scaleX(-1); opacity: 0; }
+        }
+
+        @keyframes runRightLeft {
+            0% { left: calc(100% + 5%); top: 40%; transform: translateY(-50%) scaleX(-1); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { left: -5%; top: 40%; transform: translateY(-50%) scaleX(1); opacity: 0; }
+        }
+
+        @keyframes runTopBottom {
+            0% { top: -5%; left: 70%; transform: translateX(-50%) scaleY(1); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: calc(100% + 5%); left: 70%; transform: translateX(-50%) scaleY(-1); opacity: 0; }
+        }
+
+        @keyframes runBottomTop {
+            0% { top: calc(100% + 5%); left: 30%; transform: translateX(-50%) scaleY(-1); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: -5%; left: 30%; transform: translateX(-50%) scaleY(1); opacity: 0; }
+        }
+
+        .run-lr { animation: runLeftRight 8s linear infinite; }
+        .run-rl { animation: runRightLeft 9s linear infinite; }
+        .run-tb { animation: runTopBottom 7s linear infinite; }
+        .run-bt { animation: runBottomTop 10s linear infinite; }
+
+        .cat-type-1 { color: #8B4513; }
+        .cat-type-2 { color: #FFA500; }
+        .cat-type-3 { color: #000000; }
+        .cat-type-4 { color: #FFFFFF; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+
+    </style>
+</head>
+<body>
+
+    <!-- Landing Page Content -->
+    <div id="landingPageContent">
+        <div class="text-center bg-white/80 backdrop-blur-sm rounded-3xl p-8 md:p-12 shadow-2xl max-w-xl w-full fade-in-up">
+            <h1 class="text-5xl md:text-6xl font-bold text-pink-700 mb-6">🎉 ยินดีต้อนรับสู่การ์ดอวยพร 🎉</h1>
+            <p class="text-xl md:text-2xl text-rose-600 mb-8">
+                เตรียมพบกับความสุขและการเฉลิมฉลอง!
+            </p>
+            <button id="startButton" class="px-8 py-4 bg-pink-600 text-white font-bold text-xl rounded-full hover:bg-pink-700 transition duration-300 ease-in-out transform hover:scale-105 shadow-lg pulse-animation">
+                เริ่มการ์ดอวยพร
+            </button>
+        </div>
+    </div>
+
+    <!-- Birthday Cards Content (Initially hidden) -->
+    <div id="birthdayCardsContainer">
+        <!-- Fireworks Canvas -->
+        <canvas id="fireworksCanvas" class="fireworks-canvas"></canvas>
+        <!-- Confetti Canvas (for card specific effects) -->
+        <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
+
+        <!-- Modal Overlay -->
+        <div id="blessingModal" class="modal-overlay">
+            <div class="modal-content" id="modalContent">
+                <div class="text-center">
+                    <h3 class="text-3xl font-bold text-pink-700 mb-4" id="modalTitle"></h3>
+                    <p class="text-pink-600 text-lg mb-6" id="modalBlessing"></p>
+                    <button class="px-6 py-2 bg-pink-600 text-white font-bold rounded-full hover:bg-pink-700 transition duration-300 ease-in-out transform hover:scale-105 shadow-md" onclick="closeModal()">
+                        ปิด
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <header class="text-center py-12">
+            <!-- ปรับปรุงหัวข้อให้ใช้ class ใหม่ -->
+            <h1 class="text-5xl main-greeting mb-4" id="mainGreeting">สุขสันต์วันเกิด 16 ขวบ 🎉</h1>
+            <p class="text-xl text-pink-600">การ์ดอวยพรแมวน่ารัก 6 แบบ</p>
+        </header>
+
+        <!-- Cards Container -->
+        <main class="container mx-auto px-4 py-8" style="perspective: 1000px;">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                
+                <!-- Card 1 -->
+                <div class="card-hover bg-gradient-to-br from-pink-300 to-rose-300 rounded-2xl p-6 shadow-lg relative" onclick="openModal(this)">
+                    <div class="running-cat-on-card run-lr cat-type-1">🐱</div>
+                    <div class="text-center">
+                        <div class="cat-animation text-6xl mb-4 cat-emoji">🎂😻</div>
+                        <h3 class="text-2xl font-bold text-pink-800 mb-2 card-title">แมวเค้กวันเกิด</h3>
+                        <p class="text-pink-700 mb-4 blessing-short">ขอให้วันเกิดของคุณหวานเหมือนเค้กชิ้นโปรด!</p>
+                        <p class="blessing-full hidden">"สุขสันต์วันเกิด ขอให้มีความสุขมากๆ นะ ขอให้ทุกวันเต็มไปด้วยรอยยิ้มและความสดใส!"</p>
+                        <button class="mt-4 px-6 py-2 bg-pink-600 text-white font-bold rounded-full hover:bg-pink-700 transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
+                            คลิกที่นี่เพื่อเปิดการ์ด
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="card-hover bg-gradient-to-br from-rose-300 to-pink-400 rounded-2xl p-6 shadow-lg relative" onclick="openModal(this)">
+                    <div class="running-cat-on-card run-rl cat-type-2">🐾</div>
+                    <div class="text-center">
+                        <div class="cat-animation text-6xl mb-4 cat-emoji">🎉😽</div>
+                        <h3 class="text-2xl font-bold text-rose-800 mb-2 card-title">แมวปาร์ตี้</h3>
+                        <p class="text-rose-700 mb-4 blessing-short">มาเต้นกันเถอะ! วันเกิดของคุณต้องสนุกที่สุด!</p>
+                        <p class="blessing-full hidden">"Happy Birthday! ขอให้ปาร์ตี้สนุกสุดๆ มีแต่เสียงหัวเราะและความทรงจำดีๆ!"</p>
+                        <button class="mt-4 px-6 py-2 bg-pink-600 text-white font-bold rounded-full hover:bg-pink-700 transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
+                            คลิกที่นี่เพื่อเปิดการ์ด
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="card-hover bg-gradient-to-br from-fuchsia-300 to-pink-300 rounded-2xl p-6 shadow-lg relative" onclick="openModal(this)">
+                    <div class="running-cat-on-card run-tb cat-type-3">🐱</div>
+                    <div class="text-center">
+                        <div class="cat-animation text-6xl mb-4 cat-emoji">🎁😺</div>
+                        <h3 class="text-2xl font-bold text-fuchsia-800 mb-2 card-title">แมวของขวัญ</h3>
+                        <p class="text-fuchsia-700 mb-4 blessing-short">ของขวัญที่ดีที่สุดคือความรักและความสุข!</p>
+                        <p class="blessing-full hidden">"รับของขวัญแห่งความสุขไปเต็มๆ ขอให้ได้ในสิ่งที่หวังและสมปรารถนาทุกประการ!"</p>
+                        <button class="mt-4 px-6 py-2 bg-pink-600 text-white font-bold rounded-full hover:bg-pink-700 transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
+                            คลิกที่นี่เพื่อเปิดการ์ด
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="card-hover bg-gradient-to-br from-pink-400 to-rose-400 rounded-2xl p-6 shadow-lg relative" onclick="openModal(this)">
+                    <div class="running-cat-on-card run-bt cat-type-4">🐾</div>
+                    <div class="text-center">
+                        <div class="cat-animation text-6xl mb-4 cat-emoji">💖😸</div>
+                        <h3 class="text-2xl font-bold text-rose-900 mb-2 card-title">แมวหัวใจ</h3>
+                        <p class="text-rose-800 mb-4 blessing-short">รักคุณมากที่สุดในวันพิเศษนี้!</p>
+                        <p class="blessing-full hidden">"รักคุณมากๆ ในวันเกิดปีนี้ ขอให้หัวใจพองโตไปด้วยความรักและความอบอุ่น!"</p>
+                        <button class="mt-4 px-6 py-2 bg-pink-600 text-white font-bold rounded-full hover:bg-pink-700 transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
+                            คลิกที่นี่เพื่อเปิดการ์ด
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="card-hover bg-gradient-to-br from-rose-200 to-pink-300 rounded-2xl p-6 shadow-lg relative" onclick="openModal(this)">
+                    <div class="running-cat-on-card run-lr cat-type-2">🐾</div>
+                    <div class="text-center">
+                        <div class="cat-animation text-6xl mb-4 cat-emoji">👑😼</div>
+                        <h3 class="text-2xl font-bold text-rose-700 mb-2 card-title">แมวเจ้าหญิง</h3>
+                        <p class="text-rose-600 mb-4 blessing-short">วันนี้คุณคือเจ้าหญิงแห่งวันเกิด!</p>
+                        <p class="blessing-full hidden">"เจ้าหญิงแห่งวันเกิด ขอให้สวยสดใสตลอดปี มีแต่สิ่งดีๆ เข้ามาในชีวิต!"</p>
+                        <button class="mt-4 px-6 py-2 bg-pink-600 text-white font-bold rounded-full hover:bg-pink-700 transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
+                            คลิกที่นี่เพื่อเปิดการ์ด
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="card-hover bg-gradient-to-br from-pink-400 to-fuchsia-400 rounded-2xl p-6 shadow-lg relative" onclick="openModal(this)">
+                    <div class="running-cat-on-card run-rl cat-type-3">🐱</div>
+                    <div class="text-center">
+                        <div class="cat-animation text-6xl mb-4 cat-emoji">🎀😹</div>
+                        <h3 class="text-2xl font-bold text-fuchsia-900 mb-2 card-title">สุขสันต์วันเกิด 16 ปี</h3>
+                        <p class="text-fuchsia-800 mb-4 blessing-short">ก้าวเข้าสู่ 16 ปีอย่างสดใสและมีพลัง!</p>
+                        <p class="blessing-full hidden">"สุขสันต์วันเกิดครบรอบ 16 ปี! ขอให้เป็นปีที่เต็มไปด้วยความสุข ความสำเร็จ และประสบการณ์ใหม่ๆ ที่น่าตื่นเต้น ขอให้เติบโตเป็นผู้ใหญ่ที่เข้มแข็งและงดงาม!"</p>
+                        <button class="mt-4 px-6 py-2 bg-pink-600 text-white font-bold rounded-full hover:bg-pink-700 transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
+                            คลิกที่นี่เพื่อเปิดการ์ด
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Special Message Section -->
+            <div class="mt-12 text-center">
+                <div class="bg-gradient-to-r from-pink-500 to-rose-500 rounded-2xl p-8 max-w-2xl mx-auto">
+                    <h2 class="text-3xl font-bold text-white mb-4">ข้อความพิเศษ</h2>
+                    <p class="text-white text-xl mb-4">"ขอให้วันเกิดของคุณเต็มไปด้วยความสุข ความรัก และแมวน่ารักๆ"</p>
+                    <div class="text-4xl">🎊🎈</div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="text-center py-8 mt-12">
+            <p class="text-pink-600">สร้างด้วยความรัก 💕</p>
+            <p class="text-pink-600">และความปรารถนาดี by FukKung</p>
+        </footer>
+    </div>
+
+    <script>
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let happyBirthdayMelodyInterval;
+
+        function playClickSound() {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+
+            oscillator.start(audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.2);
+            oscillator.stop(audioContext.currentTime + 0.2);
+        }
+
+        function playHappyBirthdayMelody() {
+            const notes = [
+                { freq: 392, duration: 0.2 }, { freq: 392, duration: 0.2 },
+                { freq: 440, duration: 0.4 },
+                { freq: 392, duration: 0.4 },
+                { freq: 523.25, duration: 0.4 },
+                { freq: 493.88, duration: 0.8 },
+                { freq: 392, duration: 0.2 }, { freq: 392, duration: 0.2 },
+                { freq: 440, duration: 0.4 },
+                { freq: 392, duration: 0.4 },
+                { freq: 587.33, duration: 0.4 },
+                { freq: 523.25, duration: 0.8 },
+                { freq: 392, duration: 0.2 }, { freq: 392, duration: 0.2 },
+                { freq: 783.99, duration: 0.4 },
+                { freq: 659.25, duration: 0.4 },
+                { freq: 523.25, duration: 0.4 },
+                { freq: 493.88, duration: 0.4 },
+                { freq: 440, duration: 0.8 },
+                { freq: 698.46, duration: 0.2 }, { freq: 698.46, duration: 0.2 },
+                { freq: 659.25, duration: 0.4 },
+                { freq: 523.25, duration: 0.4 },
+                { freq: 587.33, duration: 0.4 },
+                { freq: 523.25, duration: 0.8 }
+            ];
+
+            let currentTime = audioContext.currentTime;
+            let totalMelodyDuration = 0;
+
+            notes.forEach(note => {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.type = 'triangle';
+                oscillator.frequency.setValueAtTime(note.freq, currentTime);
+
+                gainNode.gain.setValueAtTime(0, currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.3, currentTime + 0.02);
+                gainNode.gain.linearRampToValueAtTime(0.1, currentTime + note.duration * 0.7);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, currentTime + note.duration);
+
+                oscillator.start(currentTime);
+                oscillator.stop(currentTime + note.duration);
+
+                currentTime += note.duration + 0.05;
+                totalMelodyDuration += note.duration + 0.05;
+            });
+            return totalMelodyDuration;
+        }
+
+        const confettiCanvas = document.getElementById('confettiCanvas');
+        const confettiCtx = confettiCanvas.getContext('2d');
+        let confettiParticles = [];
+        let confettiAnimationFrameId;
+
+        function resizeConfettiCanvas() {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+        }
+        resizeConfettiCanvas();
+        window.addEventListener('resize', resizeConfettiCanvas);
+
+        class ConfettiParticle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.radius = Math.random() * 3 + 1;
+                this.velocity = {
+                    x: (Math.random() - 0.5) * 8,
+                    y: (Math.random() - 0.5) * 8 - 5
+                };
+                this.alpha = 1;
+                this.gravity = 0.2;
+                this.rotation = Math.random() * 360;
+                this.rotationSpeed = Math.random() * 10 - 5;
+            }
+
+            draw() {
+                confettiCtx.save();
+                confettiCtx.globalAlpha = this.alpha;
+                confettiCtx.translate(this.x, this.y);
+                confettiCtx.rotate(this.rotation * Math.PI / 180);
+                confettiCtx.fillStyle = this.color;
+                confettiCtx.fillRect(-this.radius / 2, -this.radius / 2, this.radius, this.radius);
+                confettiCtx.restore();
+            }
+
+            update() {
+                this.velocity.y += this.gravity;
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                this.alpha -= 0.02;
+                this.rotation += this.rotationSpeed;
+            }
+        }
+
+        function createConfettiBurst(x, y) {
+            const colors = ['#FF69B4', '#FF1493', '#C71585', '#DB7093', '#FF007F', '#FFC0CB'];
+            const particleCount = 30 + Math.floor(Math.random() * 20);
+
+            for (let i = 0; i < particleCount; i++) {
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                confettiParticles.push(new ConfettiParticle(x, y, color));
+            }
+        }
+
+        function animateConfetti() {
+            confettiAnimationFrameId = requestAnimationFrame(animateConfetti);
+            confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+
+            for (let i = confettiParticles.length - 1; i >= 0; i--) {
+                const particle = confettiParticles[i];
+                particle.update();
+                particle.draw();
+
+                if (particle.alpha <= 0.05 || particle.y > confettiCanvas.height) {
+                    confettiParticles.splice(i, 1);
+                }
+            }
+        }
+        animateConfetti();
+
+        const blessingModal = document.getElementById('blessingModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBlessing = document.getElementById('modalBlessing');
+
+        function openModal(cardElement) {
+            playClickSound();
+
+            cardElement.style.border = '3px solid green';
+            setTimeout(() => {
+                cardElement.style.border = '0px solid transparent';
+            }, 700);
+            console.log("Card clicked:", cardElement.querySelector('.card-title').textContent);
+
+            const cardTitle = cardElement.querySelector('.card-title').textContent;
+            const fullBlessingText = cardElement.querySelector('.blessing-full').textContent;
+            const catEmojiElement = cardElement.querySelector('.cat-emoji');
+
+            modalTitle.textContent = cardTitle;
+            modalBlessing.textContent = fullBlessingText;
+            blessingModal.classList.add('active');
+
+            catEmojiElement.classList.add('cat-shake');
+            setTimeout(() => {
+                catEmojiElement.classList.remove('cat-shake');
+            }, 500);
+
+            // ลบการสร้าง yarn ball ออก
+            // const yarnBall = document.createElement('span');
+            // yarnBall.textContent = '🧶';
+            // yarnBall.classList.add('yarn-ball');
+            // 
+            // cardElement.appendChild(yarnBall);
+            // console.log("Yarn ball created and appended to:", cardElement);
+            // 
+            // setTimeout(() => {
+            //     yarnBall.remove();
+            //     console.log("Yarn ball removed.");
+            // }, 3000);
+
+            const rect = cardElement.getBoundingClientRect();
+            createConfettiBurst(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        }
+
+        function closeModal() {
+            playClickSound();
+            blessingModal.classList.remove('active');
+        }
+
+        const fireworksCanvas = document.getElementById('fireworksCanvas');
+        const fireworksCtx = fireworksCanvas.getContext('2d');
+        let fireworksParticles = [];
+        let fireworksAnimationFrameId;
+
+        function resizeFireworksCanvas() {
+            fireworksCanvas.width = window.innerWidth;
+            fireworksCanvas.height = window.innerHeight;
+        }
+        resizeFireworksCanvas();
+        window.addEventListener('resize', resizeFireworksCanvas);
+
+        class FireworkParticle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.radius = Math.random() * 2 + 1;
+                this.velocity = {
+                    x: (Math.random() - 0.5) * 5,
+                    y: (Math.random() - 0.5) * 5
+                };
+                this.alpha = 1;
+                this.friction = 0.99;
+                this.gravity = 0.05;
+            }
+
+            draw() {
+                fireworksCtx.save();
+                fireworksCtx.globalAlpha = this.alpha;
+                fireworksCtx.beginPath();
+                fireworksCtx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+                fireworksCtx.fillStyle = this.color;
+                fireworksCtx.fill();
+                fireworksCtx.restore();
+            }
+
+            update() {
+                this.velocity.x *= this.friction;
+                this.velocity.y *= this.friction;
+                this.velocity.y += this.gravity;
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                this.alpha -= 0.01;
+            }
+        }
+
+        function createFirework(x, y) {
+            const hue = Math.random() * 360;
+            const color = `hsl(${hue}, 100%, 50%)`;
+            const particleCount = 50 + Math.floor(Math.random() * 50);
+
+            for (let i = 0; i < particleCount; i++) {
+                fireworksParticles.push(new FireworkParticle(x, y, color));
+            }
+        }
+
+        function animateFireworks() {
+            fireworksAnimationFrameId = requestAnimationFrame(animateFireworks);
+            fireworksCtx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+
+            for (let i = fireworksParticles.length - 1; i >= 0; i--) {
+                const particle = fireworksParticles[i];
+                particle.update();
+                particle.draw();
+
+                if (particle.alpha <= 0.05 || particle.radius < 0.5) {
+                    fireworksParticles.splice(i, 1);
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const landingPageContent = document.getElementById('landingPageContent');
+            const birthdayCardsContainer = document.getElementById('birthdayCardsContainer');
+            const startButton = document.getElementById('startButton');
+
+            birthdayCardsContainer.style.display = 'none';
+
+            startButton.addEventListener('click', function() {
+                landingPageContent.classList.add('hidden');
+                
+                setTimeout(() => {
+                    landingPageContent.style.display = 'none';
+                    document.body.style.background = 'linear-gradient(to bottom right, #fbcfe8, #fce7f3, #fecdd3)';
+                    document.body.classList.remove('items-center', 'justify-content');
+                    document.body.classList.add('flex-col');
+
+                    birthdayCardsContainer.style.display = 'flex';
+                    setTimeout(() => {
+                        birthdayCardsContainer.classList.add('active');
+                    }, 10);
+
+                    animateFireworks();
+                    for(let i = 0; i < 5; i++) {
+                        setTimeout(() => createFirework(Math.random() * fireworksCanvas.width, Math.random() * fireworksCanvas.height * 0.7), i * 500);
+                    }
+                    setInterval(() => createFirework(Math.random() * fireworksCanvas.width, Math.random() * fireworksCanvas.height * 0.7), 1500);
+
+                    const melodyDuration = playHappyBirthdayMelody();
+                    happyBirthdayMelodyInterval = setInterval(playHappyBirthdayMelody, melodyDuration * 1000);
+                }, 500);
+            });
+        });
+    </script>
+</body>
+</html>
